@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="MyException">
+    <Position X="12.25" Y="7.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Library">
+    <Position X="6.25" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAARAAAAEAAgAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Basic">
+    <Position X="9.25" Y="2.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAEAAAAAAABAAAAAAAAACAAIAABAAAA=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VectorLibrary">
+    <Position X="6.25" Y="4.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAACAEAAAAAAAAAAAAAAAAACAAIAAAAAAQ=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MapLibrary">
+    <Position X="11.25" Y="4.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAACAEAQAAAAAAAAAAAAAAACAAIAAAAAAA=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Factory">
+    <Position X="9" Y="7.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Laba4.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

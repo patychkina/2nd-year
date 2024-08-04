@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Exponential">
+    <Position X="1.5" Y="2.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASABAAAAAAA=</HashCode>
+      <FileName>Exponential.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Linear">
+    <Position X="5" Y="2.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAkACAAAAAAAAA=</HashCode>
+      <FileName>Linear.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Progression">
+    <Position X="3.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Progression.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ProgressionCalculator">
+    <Position X="1.25" Y="4.5" Width="6.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>ProgressionCalculator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,21 @@
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.exe.config
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.exe
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.pdb
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Form1.resources
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Form2.resources
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Properties.Resources.resources
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.csproj.GenerateResource.cache
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.csproj.CoreCompileInputs.cache
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.exe
+C:\Users\Liza_\РС\2 курс\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.pdb
+F:\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.exe.config
+F:\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.exe
+F:\ооп\Laba№6\Laba№6\Laba№6\bin\Debug\Laba№6.pdb
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.csproj.AssemblyReference.cache
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Form1.resources
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Form2.resources
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba_6.Properties.Resources.resources
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.csproj.GenerateResource.cache
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.csproj.CoreCompileInputs.cache
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.exe
+F:\ооп\Laba№6\Laba№6\Laba№6\obj\Debug\Laba№6.pdb

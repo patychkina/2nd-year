@@ -1,0 +1,645 @@
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 1
+laba7.asm
+
+
+
+      1					 ;Laboratory task 7, 2th variant
+      2	    0000			 model small
+      3					 .486
+      4	    0000			 stack 100h
+      5	    0000			 dataseg
+      6					 ; Переменные	для A
+      7	    0000  45 6E	74 65 72 20 74+	 askA	     db	'Enter the number A: $'
+      8		  68 65	20 6E 75 6D 62+
+      9		  65 72	20 41 3A 20 24
+     10	    0015  0A			 bufA	       db 10
+     11	    0016  ??			 lenA	     db	?
+     12	    0017  0A*(??)		 bufferA	 db 10 dup(?)
+     13	    0021  0000000000000000	 A	     dq	0
+     14					 ; Переменные	для B
+     15	    0029  45 6E	74 65 72 20 74+	 askB	     db	'Enter the number B: $'
+     16		  68 65	20 6E 75 6D 62+
+     17		  65 72	20 42 3A 20 24
+     18	    003E  0A			 bufB	       db 10
+     19	    003F  ??			 lenB	     db	?
+     20	    0040  0A*(??)		 bufferB	 db 10 dup(?)
+     21	    004A  0000000000000000	 B	     dq	0
+     22					 ; Переменные	для Е
+     23	    0052  45 6E	74 65 72 20 74+	 askE	     db	'Enter the number E: $'
+     24		  68 65	20 6E 75 6D 62+
+     25		  65 72	20 45 3A 20 24
+     26	    0067  0A			 bufE	       db 10
+     27	    0068  ??			 lenE	     db	?
+     28	    0069  0A*(??)		 bufferE	 db 10 dup(?)
+     29	    0073  0000000000000000	 E	     dq	0
+     30					 ; Переменные	для результата
+     31	    007B  54 68	65 20 65 71 75+	 isError      db 'The equation has no roots on a given segment.$'
+     32		  61 74	69 6F 6E 20 68+
+     33		  61 73	20 6E 6F 20 72+
+     34		  6F 6F	74 73 20 6F 6E+
+     35		  20 61	20 67 69 76 65+
+     36		  6E 20	73 65 67 6D 65+
+     37		  6E 74	2E 24
+     38	    00A9  54 68	65 20 72 6F 6F+	 isSuccess    db 'The root of the equation is $'
+     39		  74 20	6F 66 20 74 68+
+     40		  65 20	65 71 75 61 74+
+     41		  69 6F	6E 20 69 73 20+
+     42		  24
+     43	    00C6  0A*(??)		 result	     db	10 dup(?)
+     44	    00D0  0000000000000000	 root	     dq	0
+     45					 ; Вспомогательные переменные
+     46	    00D8  0000000000000002	 num	     dq	2
+     47	    00E0  0000000000000000	 y1	     dq	0
+     48	    00E8  0000000000000000	 y2	     dq	0
+     49	    00F0  0000000000000000	 y1y2	     dq	0
+     50	    00F8  0D 0A	24		 isEnter      db 0Dh, 0Ah, '$'
+     51
+     52	    00FB			 codeseg
+     53	    0000			 start:
+     54						 startupcode
+1    55	    0000			 @Startup:
+1    56	    0000  BA 0000s			 MOV	 DX,@data
+1    57	    0003  8E DA				 MOV	 DS,DX
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 2
+laba7.asm
+
+
+
+1    58	    0005  8C D3				 MOV	 BX,SS
+1    59	    0007  2B DA				 SUB	 BX,DX
+1    60	    0009  C1 E3	04			 SHL	 BX,4
+1    61	    000C  8E D2				 MOV	 SS,DX
+1    62	    000E  03 E3				 ADD	 SP,BX
+     63	    0010  9B DB	E3			 finit	;инициализация сопроцессора
+     64	    0013			 enterAB:
+     65					     ;Ввод А
+     66	    0013  B4 09				 mov AH, 09h
+     67	    0015  BA 0000r		     lea DX, askA
+     68	    0018  CD 21			     int 21h
+     69
+     70	    001A  B4 0A				 mov AH, 0Ah
+     71	    001C  BA 0015r		     lea DX, bufA
+     72	    001F  CD 21			     int 21h
+     73
+     74	    0021  B4 09				 mov AH, 09h
+     75	    0023  BA 00F8r		     lea DX, isEnter
+     76	    0026  CD 21			     int 21h
+     77
+     78						 ;Ввод В
+     79	    0028  B4 09				 mov AH, 09h
+     80	    002A  BA 0029r		     lea DX, askB
+     81	    002D  CD 21			     int 21h
+     82
+     83	    002F  B4 0A				 mov AH, 0Ah
+     84	    0031  BA 003Er		     lea DX, bufB
+     85	    0034  CD 21			     int 21h
+     86
+     87	    0036  B4 09				 mov AH, 09h
+     88	    0038  BA 00F8r		     lea DX, isEnter
+     89	    003B  CD 21			     int 21h
+     90
+     91	    003D  68 0021r			 push offset A
+     92	    0040  68 0017r			 push offset bufferA
+     93	    0043  E8 0243			 call StrToDouble
+     94
+     95	    0046  68 004Ar			 push offset B
+     96	    0049  68 0040r			 push offset bufferB
+     97	    004C  E8 023A			 call StrToDouble
+     98
+     99	    004F  DD 06	0021r			 fld A ;Загрузка числа из памяти в вершину	стека  +
+    100					 сопроцессора
+    101	    0053  DD 06	004Ar			 fld B ; Загрузка числа из памяти в вершину стека +
+    102					 сопроцессора
+    103	    0057  D8 D1				 fcom ;	Сравниваем вещественные числа
+    104	    0059  9B DF	E0			 fstsw AX   ;копирует текущий статус сопроцессора, +
+    105					 включая	флаги условий, в регистр AX
+    106	    005C  9E				 sahf ;загружает регистр флагов процессора	    +
+    107					 значениями из регистра AH
+    108	    005D  72 B4				 jb enterAB
+    109
+    110	    005F			 enterE:
+    111						 ;вводим Е
+    112	    005F  B4 09				 mov AH, 09h
+    113	    0061  BA 0052r			 lea DX, askE
+    114	    0064  CD 21				 int 21h
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 3
+laba7.asm
+
+
+
+    115
+    116	    0066  B4 0A				 mov AH, 0Ah
+    117	    0068  BA 0067r			 lea DX, bufE
+    118	    006B  CD 21				 int 21h
+    119
+    120	    006D  B4 09				 mov AH, 09h
+    121	    006F  BA 00F8r			 lea DX, isEnter
+    122	    0072  CD 21				 int 21h
+    123
+    124	    0074  68 0073r			 push offset E
+    125	    0077  68 0069r			 push offset bufferE
+    126	    007A  E8 020C			 call StrToDouble
+    127
+    128	    007D  DD 06	0073r			 fld E
+    129	    0081  D9 E4				 ftst
+    130	    0083  9B DF	E0			 fstsw ax
+    131	    0086  9E				 sahf
+    132	    0087  76 D6				 jbe enterE
+    133
+    134	    0089			 checkRoot: ;проверка на сходимость	f(a)*f(b)<0
+    135	    0089  DD 06	0021r			 fld A
+    136	    008D  E8 00E4			 call function
+    137	    0090  DD 16	00E0r			 fst y1
+    138
+    139
+    140	    0094  DD 06	004Ar			 fld B
+    141	    0098  E8 00D9			 call function
+    142	    009B  DD 16	00E8r			 fst y2
+    143
+    144	    009F  DD 06	00E0r			 fld y1
+    145	    00A3  DD 06	00E8r			 fld y2
+    146	    00A7  DE C9				 fmul
+    147
+    148	    00A9  DD 16	00F0r			 fst y1y2
+    149	    00AD  D8 D1				 fcom
+    150	    00AF  9B DF	E0			 fstsw ax
+    151	    00B2  9E				 sahf
+    152	    00B3  77 23	90 90			 ja endNoRoot
+    153
+    154	    00B7			 find_root:
+    155	    00B7  E8 0038			 call findRoot
+    156	    00BA  DD 16	00D0r			 fst root
+    157	    00BE  68 00C6r			 push offset result
+    158	    00C1  68 00D0r			 push offset root
+    159	    00C4  E8 00F9			 call DoubleToStr
+    160
+    161	    00C7  B4 09				 mov AH, 09h
+    162	    00C9  BA 00A9r			 lea DX, isSuccess
+    163	    00CC  CD 21				 int 21h
+    164
+    165	    00CE  B4 09				 mov AH, 09h
+    166	    00D0  BA 00C6r			 lea DX, result
+    167	    00D3  CD 21				 int 21h
+    168
+    169	    00D5  EB 08	90			 jmp quit
+    170
+    171
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 4
+laba7.asm
+
+
+
+    172	    00D8			 endNoRoot:
+    173	    00D8  B4 09				 mov AH, 09h
+    174	    00DA  BA 007Br			 lea DX, isError
+    175	    00DD  CD 21				 int 21h
+    176
+    177	    00DF			 quit:
+    178	    00DF  B4 0A				 mov AH, 0Ah
+    179	    00E1  BA 0015r			 lea DX, bufA
+    180	    00E4  CD 21				 int 21h
+    181	    00E6  B4 09				 mov AH, 09h
+    182
+    183	    00E8  BA 00F8r			 lea DX, isEnter
+    184	    00EB  CD 21				 int 21h
+    185						 exitcode 0
+1   186	    00ED  B8 4C00			 MOV	 AX,04C00h
+1   187	    00F0  CD 21				 INT	 21h
+    188
+    189
+    190					 ;Действие:
+    191						 ;Нахождение корня функции на отрезке методом +
+    192					 деления	отрезка пополам с точностью E
+    193					 ;Параметры:
+    194						 ;Входные параметры: ST(0) <- E, ST(1) <- A, ST(2) <- B
+    195					 ;Возвращает:
+    196						 ;ST(0)
+    197
+    198					 ;Подпрограмма для нахождения корня уравнения
+    199	    00F2			 findRoot proc near
+    200	    00F2			 startDo:
+    201	    00F2			 checkLoop:
+    202	    00F2  DD 06	004Ar			 fld B ;добавить в ST(0)  B
+    203	    00F6  DD 06	0021r			 fld A ;добавить в ST(0) A
+    204	    00FA  DE E9				 fsub ;записать	в ST(0) A-B
+    205	    00FC  DD 06	0073r			 fld E ;добавить в ST(0) E
+    206	    0100  D8 D1				 fcom ;сравнить	ST(0) и ST(1)
+    207	    0102  9B DF	E0			 fstsw ax ;загрузить регистр SWR в AX
+    208	    0105  9E				 sahf ;	загрузить AH в младший	байт регистра	    +
+    209					 флагов
+    210	    0106  77 5B	90 90			 ja endDo
+    211	    010A  DD 06	0021r			 fld A
+    212	    010E  E8 0063			 call function
+    213	    0111  DD 16	00E0r			 fst y1	;y1 <- ST(0)
+    214	    0115  DD 06	0021r			 fld A
+    215	    0119  DD 06	004Ar			 fld B
+    216	    011D  DE C1				 fadd  ;записать в ST(0) A+B
+    217	    011F  DF 2E	00D8r			 fild num  ;добавить в	ST(0) 2
+    218	    0123  DE F9				 fdiv ;записать	в ST(0) (A+B)/2
+    219	    0125  DD 16	00D0r			 fst root ;root	<- ST(0)
+    220
+    221	    0129  DD 06	00D0r			 fld root ;ST(0)<- root
+    222	    012D  E8 0044			 call function
+    223	    0130  DD 16	00E8r			 fst y2	;y2 <- ST(0)
+    224
+    225	    0134  DD 06	00E0r			 fld y1	;ST(0)<- y1
+    226	    0138  DD 06	00E8r			 fld y2	;ST(0)<- y2
+    227	    013C  DE C9				 fmul ;ST(0)<- y1*y2
+    228	    013E  DD 16	00F0r			 fst y1y2 ;y1y2	<- ST(0)
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 5
+laba7.asm
+
+
+
+    229	    0142  D8 D1				 fcom ;сравнить	ST(0) и ST(1)
+    230	    0144  9B DF	E0			 fstsw ax   ;загрузить	регистр SWR в AX
+    231	    0147  9E				 sahf ;	загрузить AH в младший	байт регистра	    +
+    232					 флагов
+    233	    0148  77 05	90 90			 ja lessZero
+    234
+    235	    014C  EB 0B	90			 jmp moreZero
+    236	    014F			 lessZero:
+    237	    014F  DD 06	00D0r			 fld root ;ST(0)<- root
+    238	    0153  DD 16	0021r			 fst A ;A <- ST(0)
+    239	    0157  EB 99				 jmp startDo
+    240
+    241	    0159			 moreZero:
+    242	    0159  DD 06	00D0r			 fld root ;ST(0)<- root
+    243	    015D  DD 16	004Ar			 fst B	;B <- ST(0)
+    244	    0161  EB 8F				 jmp startDo
+    245
+    246	    0163			 endDo:
+    247	    0163  DD 06	0021r			 fld A ;добавить в ST(0) A
+    248	    0167  DD 06	004Ar			 fld B ;добавить в ST(0)  B
+    249	    016B  DE C1				 fadd  ;записать в ST(0) A+B
+    250	    016D  DF 2E	00D8r			 fild num  ;добавить в	ST(0) 2
+    251	    0171  DE F9				 fdiv ;записать	в ST(0) (A+B)/2
+    252	    0173  C3				 ret
+    253	    0174			 findRoot endp
+    254
+    255
+    256					 ; Подпрограмма, выполняющая вычисление функции	f   +
+    257					 (x)=x^3–7x^2–9x+49
+    258					 ;Действие:
+    259						 ;Вычисляет функцию от заданного значения
+    260					 ;Параметры:
+    261						 ;Входные параметры: ST(0)
+    262					 ;Возвращает:
+    263						 ;ST(0)
+    264	    0174			 function proc near
+    265	    0174  55				 push bp
+    266	    0175  8B EC				 mov bp, sp ;заносим вершину стека
+    267	    0177  83 EC	08			 sub sp, 8 ;выделяем 8 байт	стека
+    268
+    269	    017A  DD 56	F8		     fst qword ptr[bp-8]
+    270	    017D  DD 46	F8			 fld qword ptr[bp-8]
+    271
+    272	    0180  DC 4E	F8			 fmul qword ptr[bp-8]
+    273	    0183  DC 4E	F8			 fmul qword ptr[bp-8]
+    274	    0186  D9 C9				 fxch st(1) ;Обмен	вершины стека ST(0)	с другим		    +
+    275					 регистром стека ST(I)
+    276
+    277	    0188  83 EC	02			 sub sp, 2
+    278
+    279	    018B  C7 46	F6 0007			 mov word ptr[bp-10], 7
+    280	    0190  DF 46	F6			 fild word ptr[bp-10] ;Загрузка	числа из	памяти в		    +
+    281					 вершину	стека сопроцессора
+    282
+    283	    0193  DC 4E	F8			 fmul qword ptr[bp-8]
+    284	    0196  DC 4E	F8			 fmul qword ptr[bp-8]
+    285	    0199  D9 E0				 fchs ;меняем знак
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 6
+laba7.asm
+
+
+
+    286
+    287	    019B  DE C2				 faddp st(2), st(0)  ;Сложение ST(i) и	ST(0) с выталкиванием +
+    288					 значения из ST(0). Результат помещается в ST(i – 1)
+    289
+    290
+    291	    019D  C7 46	F6 0009			 mov word ptr[bp-10], 9
+    292	    01A2  DF 46	F6			 fild word ptr[bp-10] ;Загрузка	числа из	памяти в		    +
+    293					 вершину	стека сопроцессора
+    294	    01A5  DD 56	F8			 fst qword ptr[bp-8]
+    295	    01A8  DE C9				 fmul
+    296	    01AA  D9 E0				 fchs ;меняем знак
+    297	    01AC  DE C1				 faddp
+    298
+    299	    01AE  C7 46	F6 0031			 mov word ptr[bp-10], 49
+    300	    01B3  DF 46	F6			 fild word ptr[bp-10]
+    301	    01B6  DE C1				 fadd
+    302
+    303	    01B8  83 C4	02			 add sp, 2
+    304	    01BB  83 C4	08			 add sp, 8
+    305	    01BE  5D				 pop bp
+    306	    01BF  C3				 ret
+    307	    01C0			 function endp
+    308
+    309
+    310					 ;Подпрограмма для перевода вещественного типа к   +
+    311					 строковому
+    312	    01C0			 DoubleToStr proc near
+    313	    01C0  55				 push bp
+    314	    01C1  8B EC				 mov bp, sp
+    315	    01C3  83 EC	04			 sub sp, 4
+    316	    01C6  50 53	52 51 57		 push ax bx dx cx di
+    317	    01CB  9C				 pushf
+    318	    01CC  D9 7E	FC			 fnstcw	[bp-4]
+    319	    01CF  D9 7E	FE			 fnstcw	[bp-2]
+    320
+    321	    01D2  81 66	FE F3FF			 and word ptr [bp - 2],	1111001111111111b
+    322	    01D7  81 4E	FE 0C00			 or word ptr [bp - 2], 0000110000000000b
+    323	    01DC  D9 6E	FE			 fldcw [bp - 2]
+    324	    01DF  8B 5E	04			 mov bx, [bp + 4]
+    325	    01E2  DD 07				 fld qword ptr[bx]
+    326	    01E4  D9 E4				 ftst
+    327	    01E6  9B DF	E0			 fstsw ax
+    328	    01E9  80 E4	01			 and ah, 1
+    329	    01EC  80 FC	01			 cmp ah, 1
+    330	    01EF  75 0B	90 90			 jne @@NBE
+    331	    01F3  8B 5E	06			 mov bx, [bp + 6]
+    332	    01F6  C6 07	2D			 mov byte ptr[bx], '-'
+    333	    01F9  FF 46	06			 inc word ptr[bp + 6]
+    334
+    335	    01FC			 @@NBE:
+    336	    01FC  D9 E1				 fabs
+    337	    01FE  DD D1				 fst st(1)
+    338	    0200  DD D2				 fst st(2)
+    339	    0202  D9 FC				 frndint
+    340	    0204  DC EA				 fsub st(2), st(0)
+    341	    0206  C7 46	FE 000A			 mov word ptr[bp - 2], 10
+    342	    020B  DF 46	FE			 fild word ptr[bp - 2]
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 7
+laba7.asm
+
+
+
+    343	    020E  D9 C9				 fxch st(1)
+    344	    0210  33 C9				 xor cx, cx
+    345
+    346	    0212			 @@BG:
+    347	    0212  D9 F8				 fprem
+    348	    0214  DF 56	FE			 fist word ptr [bp - 2]
+    349	    0217  FF 76	FE			 push word ptr [bp - 2]
+    350	    021A  D9 CA				 fxch st(2)
+    351	    021C  D8 F1				 fdiv st(0), st(1)
+    352	    021E  D9 FC				 frndint
+    353	    0220  DD D2				 fst st(2)
+    354	    0222  41				 inc cx
+    355	    0223  D9 E4				 ftst
+    356	    0225  9B DF	E0			 fstsw ax
+    357	    0228  9E				 sahf
+    358
+    359	    0229  75 E7				 jnz @@BG ; если 14	бит SR == 0 (6 бит AH) (если zf == 0 прыжок)
+    360	    022B  8B C1				 mov ax, cx
+    361	    022D  8B 5E	06			 mov bx, [bp + 6]
+    362
+    363	    0230			 @@BFG:
+    364	    0230  5A				 pop dx
+    365	    0231  83 C2	30			 add dx, '0'
+    366	    0234  88 17				 mov byte ptr[bx], dl
+    367	    0236  43				 inc bx
+    368	    0237  E2 F7				 loop @@BFG
+    369	    0239  D9 CB				 fxch st(3)
+    370	    023B  DD D2				 fst st(2)
+    371	    023D  D9 E4				 ftst
+    372	    023F  9B DF	E0			 fstsw ax
+    373	    0242  9E				 sahf
+    374	    0243  74 2B	90 90			 jz @@CNE
+    375	    0247  C6 07	2E			 mov byte ptr[bx], '.'
+    376	    024A  B9 0010			 mov cx, 16
+    377
+    378	    024D			 @@BFR:
+    379	    024D  D8 C9				 fmul st(0), st(1)
+    380	    024F  DD D2				 fst st(2)
+    381	    0251  D9 FC				 frndint
+    382	    0253  DC EA				 fsub st(2), st(0)
+    383	    0255  DF 56	FE			 fist word ptr [bp - 2]
+    384	    0258  D9 CA				 fxch st(2)
+    385	    025A  8B 46	FE			 mov ax, [bp - 2]
+    386	    025D  05 0030			 add ax, '0'
+    387	    0260  43				 inc bx
+    388	    0261  88 07				 mov byte ptr[bx], al
+    389	    0263  E2 E8				 loop @@BFR
+    390
+    391	    0265			 @@NIL:
+    392	    0265  80 3F	30			 cmp byte ptr[bx], '0'
+    393	    0268  75 05	90 90			 jne @@CNR
+    394	    026C  4B				 dec bx
+    395	    026D  EB F6				 jmp @@NIL
+    396
+    397	    026F			 @@CNR:
+    398	    026F  43				 inc bx
+    399
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 8
+laba7.asm
+
+
+
+    400	    0270			 @@CNE:
+    401	    0270  C6 07	24			 mov byte ptr[bx], '$'
+    402	    0273  DD D8				 fstp st(0)
+    403	    0275  DD D8				 fstp st(0)
+    404
+    405	    0277  DD D8				 fstp st(0)
+    406	    0279  DD D8				 fstp st(0)
+    407	    027B  D9 6E	FC			 fldcw [bp - 4]
+    408	    027E  9D				 popf
+    409	    027F  5F 59	5A 5B 58		 pop di	cx dx bx ax
+    410	    0284  83 C4	04			 add sp, 4
+    411	    0287  5D				 pop bp
+    412	    0288  C3				 ret
+    413	    0289			 DoubleToStr endp
+    414
+    415					 ;Подпрограмма для перевода строкового	типа к	    +
+    416					 вещественному
+    417
+    418	    0289			 StrToDouble proc near
+    419	    0289  55				 push bp
+    420	    028A  8B EC				 mov bp, sp
+    421	    028C  83 EC	02			 sub sp, 2
+    422	    028F  50 53	52 51 57		 push ax bx dx cx di
+    423	    0294  9C				 pushf
+    424	    0295  C7 46	FE 000A			 mov word ptr[bp - 2], 10 ;Резервируется два байта	для	    +
+    425					 временного хранения числа 10
+    426	    029A  DF 46	FE			 fild word ptr[bp - 2]
+    427	    029D  D9 EE				 fldz ;Загрузить 0
+    428	    029F  BF 0000			 mov di, 0
+    429	    02A2  8B 5E	04			 mov bx, [bp + 4]
+    430	    02A5  80 3F	2D			 cmp byte ptr[bx], '-' ;Проверяется,	является ли первый  +
+    431					 символ строки минусом, указывающим на			    +
+    432					 отрицательное число.
+    433	    02A8  75 06	90 90			 jne @@BPN
+    434	    02AC  43				 inc bx
+    435	    02AD  BF 0001			 mov di, 1
+    436
+    437	    02B0			 @@BPN:
+    438
+    439	    02B0  0F BE	07			 movsx ax, byte	ptr [bx];Загружаем текущий символ	строки+
+    440					 в регистр
+    441	    02B3  3D 002E			 cmp ax, '.'
+    442	    02B6  74 1E	90 90			 je @@PNT1
+    443	    02BA  3D 000D			 cmp ax, 0dh
+    444	    02BD  75 09	90 90			 jne @@CNT
+    445	    02C1  D9 C9				 fxch st(1)
+    446	    02C3  DD D8				 fstp st(0) ;Сохранение числа из вершины стека	    +
+    447					 сопроцессора в память с последующим			    +
+    448					 выталкиванием его из	вершины стека
+    449	    02C5  EB 41	90			 jmp @@REN
+    450
+    451	    02C8			 @@CNT:
+    452	    02C8  2D 0030			 sub ax, '0'
+    453	    02CB  89 46	FE			 mov word ptr[bp - 2], ax
+    454	    02CE  D8 C9				 fmul st(0), st(1)
+    455	    02D0  DE 46	FE			 fiadd word ptr[bp - 2]
+    456	    02D3  43				 inc bx
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 9
+laba7.asm
+
+
+
+    457	    02D4  EB DA				 jmp @@BPN
+    458
+    459	    02D6			 @@PNT1:
+    460	    02D6  33 C9				 xor cx, cx
+    461
+    462	    02D8			 @@BEG:
+    463	    02D8  43				 inc bx
+    464	    02D9  0F BE	07			 movsx ax, byte	ptr [bx]
+    465	    02DC  3D 000D			 cmp ax, 0dh
+    466	    02DF  74 04	90 90			 je @@END
+    467	    02E3  E2 F3				 loop @@BEG
+    468
+    469	    02E5			 @@END:
+    470	    02E5  4B				 dec bx
+    471	    02E6  D9 C9				 fxch st(1)
+    472	    02E8  D9 EE				 fldz
+    473
+    474	    02EA			 @@APN:
+    475	    02EA  0F BE	07			 movsx ax, [bx]
+    476	    02ED  3D 002E			 cmp ax, '.'
+    477	    02F0  74 10	90 90			 je @@PNT2
+    478	    02F4  2D 0030			 sub ax, '0'
+    479	    02F7  89 46	FE			 mov word ptr[bp - 2], ax
+    480	    02FA  DE 46	FE			 fiadd word ptr[bp - 2]
+    481	    02FD  D8 F1				 fdiv st(0), st(1) ;Делит значение	ST(0) на ST(1). Результат+
+    482					 помещается в ST(0)
+    483	    02FF  4B				 dec bx
+    484	    0300  EB E8				 jmp @@APN
+    485
+    486	    0302			 @@PNT2:
+    487	    0302  D9 C9				 fxch st(1)
+    488	    0304  DD D8				 fstp st(0)
+    489	    0306  DE C1				 faddp st(1)
+    490
+    491	    0308			 @@REN:
+    492	    0308  83 FF	01			 cmp di, 1 ;Проверяем,	было ли изначально число	    +
+    493					 отрицательным.
+    494	    030B  75 04	90 90			 jne @@CYK
+    495	    030F  D9 E0				 fchs ;Инвертируем
+    496
+    497	    0311			 @@CYK:
+    498	    0311  8B 5E	06			 mov bx, [bp + 6]
+    499	    0314  DD 1F				 fstp qword ptr	[bx]
+    500	    0316  9D				 popf
+    501	    0317  5F 59	5A 5B 58		 pop di	cx dx bx ax
+    502	    031C  83 C4	02			 add sp, 2
+    503	    031F  5D				 pop bp
+    504	    0320  C3				 ret
+    505	    0321			 StrToDouble endp
+    506							 end start
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 10
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "12/12/23"
+??FILENAME			  Text	 "laba7	  "
+??TIME				  Text	 "08:23:02"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@@APN				  Near	 _TEXT:02EA
+@@BEG				  Near	 _TEXT:02D8
+@@BFG				  Near	 _TEXT:0230
+@@BFR				  Near	 _TEXT:024D
+@@BG				  Near	 _TEXT:0212
+@@BPN				  Near	 _TEXT:02B0
+@@CNE				  Near	 _TEXT:0270
+@@CNR				  Near	 _TEXT:026F
+@@CNT				  Near	 _TEXT:02C8
+@@CYK				  Near	 _TEXT:0311
+@@END				  Near	 _TEXT:02E5
+@@NBE				  Near	 _TEXT:01FC
+@@NIL				  Near	 _TEXT:0265
+@@PNT1				  Near	 _TEXT:02D6
+@@PNT2				  Near	 _TEXT:0302
+@@REN				  Near	 _TEXT:0308
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 1F1FH
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA7
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@STARTUP			  Near	 _TEXT:0000
+@WORDSIZE			  Text	 2
+A				  Qword	 DGROUP:0021
+ASKA				  Byte	 DGROUP:0000
+ASKB				  Byte	 DGROUP:0029
+ASKE				  Byte	 DGROUP:0052
+B				  Qword	 DGROUP:004A
+BUFA				  Byte	 DGROUP:0015
+BUFB				  Byte	 DGROUP:003E
+BUFE				  Byte	 DGROUP:0067
+BUFFERA				  Byte	 DGROUP:0017
+BUFFERB				  Byte	 DGROUP:0040
+BUFFERE				  Byte	 DGROUP:0069
+CHECKLOOP			  Near	 _TEXT:00F2
+CHECKROOT			  Near	 _TEXT:0089
+DOUBLETOSTR			  Near	 _TEXT:01C0
+E				  Qword	 DGROUP:0073
+ENDDO				  Near	 _TEXT:0163
+ENDNOROOT			  Near	 _TEXT:00D8
+ENTERAB				  Near	 _TEXT:0013
+ENTERE				  Near	 _TEXT:005F
+FINDROOT			  Near	 _TEXT:00F2
+FIND_ROOT			  Near	 _TEXT:00B7
+Turbo Assembler	 Version 3.1	    12/12/23 08:23:02	    Page 11
+Symbol Table
+
+
+
+FUNCTION			  Near	 _TEXT:0174
+ISENTER				  Byte	 DGROUP:00F8
+ISERROR				  Byte	 DGROUP:007B
+ISSUCCESS			  Byte	 DGROUP:00A9
+LENA				  Byte	 DGROUP:0016
+LENB				  Byte	 DGROUP:003F
+LENE				  Byte	 DGROUP:0068
+LESSZERO			  Near	 _TEXT:014F
+MOREZERO			  Near	 _TEXT:0159
+NUM				  Qword	 DGROUP:00D8
+QUIT				  Near	 _TEXT:00DF
+RESULT				  Byte	 DGROUP:00C6
+ROOT				  Qword	 DGROUP:00D0
+START				  Near	 _TEXT:0000
+STARTDO				  Near	 _TEXT:00F2
+STRTODOUBLE			  Near	 _TEXT:0289
+Y1				  Qword	 DGROUP:00E0
+Y1Y2				  Qword	 DGROUP:00F0
+Y2				  Qword	 DGROUP:00E8
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  00FB Word	  Public  DATA
+_TEXT				  16  0321 Word	  Public  CODE
+

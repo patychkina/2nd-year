@@ -1,0 +1,118 @@
+Turbo Assembler	 Version 3.1	    10/09/23 11:00:07	    Page 1
+laba3.asm
+
+
+
+      1	0000				     model SMALL									    +
+      2				     ; Определение типа модели памяти
+      3
+      4	0000				     stack 100h										    +
+      5				     ; Определение сегмента стека размером 256 байт
+      6	0000				     dataseg										    +
+      7				     ; Определение сегмента данных
+      8
+      9	0000  ????		     count	     dw	?									    +
+     10				     ; Переменная размером 2 байта
+     11	0002  56C3 A50A	954B AC26 +  mass	     dw	056C3h,	0A50Ah,	954Bh, 0AC26h, 02D29h, 0A788h, 02C6Dh, 0628Fh, 01D80h,	    +
+     12	      2D29 A788	2C6D 628F +  094FFh	   ; Массив слов в 16-ричной СС
+     13	      1D80 94FF
+     14	0016  000A		     size_mass	     dw	10									    +
+     15				     ; Размер массива
+     16
+     17	0018				     codeseg										    +
+     18				     ; Определение сегмент кода
+     19	0000			     START:
+     20					     startupcode									    +
+     21				     ; Начало выполнения программы
+1    22	0000			     @Startup:
+1    23	0000  BA 0000s			     MOV     DX,@data
+1    24	0003  8E DA			     MOV     DS,DX
+1    25	0005  8C D3			     MOV     BX,SS
+1    26	0007  2B DA			     SUB     BX,DX
+1    27	0009  D1 E3 D1 E3 D1 E3	D1+	     SHL     BX,4
+     28	      E3
+1    29	0011  FA			     CLI
+1    30	0012  8E D2			     MOV     SS,DX
+1    31	0014  03 E3			     ADD     SP,BX
+1    32	0016  FB			     STI
+     33
+     34	0017  BB 0002r			     lea BX, mass									    +
+     35				     ; Загрузить адрес массива
+     36	001A  8B 0E 0016r		     mov CX, size_mass									    +
+     37				     ; Установить счётчик
+     38	001E  BA 0000			     mov DX, 0
+     39
+     40	0021			     BEG:
+     41	0021  8B 07			     mov AX, [BX]									    +
+     42				     ; Элемент массива по адресу BX в регистр -			    +
+     43				     аккумулятор, 2 байта
+     44	0023  25 001F			     and AX, 1Fh									    +
+     45				     ; Выполняем поразрядную конъюнкцию, оставляя	в дате +
+     46				     только день
+     47	0026  3D 000A			     cmp AX, 10										    +
+     48				     ; Смотрим дата относится к первой декаде или нет
+     49	0029  77 03			     jnbe NO										    +
+     50				     ; Если	значение больше 10 переходим по метке NO
+     51	002B  83 C2 01			     add DX, 1										    +
+     52				     ; Увеличиваем счётчик на 1
+     53	002E			     NO:
+     54	002E  83 C3 02			     add BX, 2										    +
+     55				     ; Следующий элемент массива
+     56	0031  E2 EE			     loop BEG										    +
+     57				     ; Возврат, если	счётчик CX <> 0
+Turbo Assembler	 Version 3.1	    10/09/23 11:00:07	    Page 2
+laba3.asm
+
+
+
+     58	0033  89 16 0000r		     mov count,	DX									    +
+     59				     ; Записть в count значения	в регистре DX
+     60
+     61	0037			     QUIT:
+     62					     exitcode 0										    +
+     63				     ; Возврат управления операционной системе, код	    +
+     64				     возврата 0
+1    65	0037  B8 4C00			     MOV     AX,04C00h
+1    66	003A  CD 21			     INT     21h
+     67					     end										    +
+     68				     ; Конец программы
+Turbo Assembler	 Version 3.1	    10/09/23 11:00:07	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/09/23"
+??FILENAME			  Text	 "laba3	  "
+??TIME				  Text	 "11:00:07"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA3
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@STARTUP			  Near	 _TEXT:0000
+@WORDSIZE			  Text	 2
+BEG				  Near	 _TEXT:0021
+COUNT				  Word	 DGROUP:0000
+MASS				  Word	 DGROUP:0002
+NO				  Near	 _TEXT:002E
+QUIT				  Near	 _TEXT:0037
+SIZE_MASS			  Word	 DGROUP:0016
+START				  Near	 _TEXT:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  0018 Word	  Public  DATA
+_TEXT				  16  003C Word	  Public  CODE
+

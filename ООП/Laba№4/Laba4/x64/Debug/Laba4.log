@@ -1,0 +1,3 @@
+﻿  Laba4.cpp
+C:\Users\Liza_\РС\2 курс\ооп\Laba№4\Laba4\Laba4.cpp(35,1): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Laba4.vcxproj -> C:\Users\Liza_\РС\2 курс\ооп\Laba№4\Laba4\x64\Debug\Laba4.exe

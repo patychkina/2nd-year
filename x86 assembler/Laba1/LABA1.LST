@@ -1,0 +1,93 @@
+Turbo Assembler	 Version 3.1	    09/09/23 20:08:46	    Page 1
+laba1.asm
+
+
+
+      1	    0000					 .model	small		 ; определить тип модели пам€ти
+      2							 .386				 ; разрешить использование инструкций 386   +
+      3					 процессора
+      4
+      5	    0000					 stack 100h			 ; определить сегмент стека размером 256 байт
+      6
+      7	    0000					 dataseg			 ; опрделить сегмент данных
+      8	    0000  FFF6			 A		 dw -10				 ; объ€вить переменную (€чейку пам€ти)	    +
+      9					 размером 2 байта
+     10	    0002  0014			 B		 dw 20				 ; объ€вить переменную (€чейку пам€ти)	    +
+     11					 размером 2 байта
+     12	    0004  0005			 C		 dw 5				 ; объ€вить переменную (€чейку пам€ти)	    +
+     13					 размером 2 байта
+     14	    0006  ????			 X		 dw ?				 ; объ€вить переменную (€чейку пам€ти)	    +
+     15					 размером 2 байта
+     16
+     17	    0008					 codeseg			 ; определить сегмент кода
+     18	    0000			 start:						 ; начало выполнени€ программы
+     19
+     20							 startupcode			 ; установить в	DS адрес начала	сегмента    +
+     21					 данных
+1    22	    0000			 @Startup:
+1    23	    0000  BA 0000s			 MOV	 DX,@data
+1    24	    0003  8E DA				 MOV	 DS,DX
+1    25	    0005  8C D3				 MOV	 BX,SS
+1    26	    0007  2B DA				 SUB	 BX,DX
+1    27	    0009  C1 E3	04			 SHL	 BX,4
+1    28	    000C  8E D2				 MOV	 SS,DX
+1    29	    000E  03 E3				 ADD	 SP,BX
+     30
+     31	    0010  A1 0000r				 mov AX, A			 ; значение A в	регистр	AX
+     32	    0013  C1 E0	03				 sal AX, 3			 ; 8A в	AX
+     33	    0016  03 06	0000r				 add AX, A			 ; 9A в	AX
+     34	    001A  F7 D8					 neg AX				 ; -AX и AX
+     35	    001C  8B 1E	0002r				 mov BX, B			 ; значение B в	регистр	BX
+     36	    0020  D1 E3					 sal BX, 1			 ; 2B в	BX
+     37	    0022  03 1E	0002r				 add BX, B			 ; 3B в	BX
+     38	    0026  C1 FB	02				 sar BX, 2			 ; 3B/4	в BX
+     39	    0029  8B 0E	0004r				 mov CX, C			 ; значение C в	регистр	CX
+     40	    002D  D1 F9					 sar CX, 1			 ; C/2 в CX
+     41	    002F  03 C3					 add AX, BX			 ; -9A+3B/4 в AX
+     42	    0031  2B C1					 sub AX, CX			 ; -9A+3B/4-C/2	в AX
+     43	    0033  A3 0006r				 mov X,	AX			 ; -9A+3B/4-C/2	в X
+     44
+     45	    0036			 quit:						 ; метка конца работы
+     46							 exitcode 0			 ; передать управление операционной системе
+1    47	    0036  B8 4C00			 MOV	 AX,04C00h
+1    48	    0039  CD 21				 INT	 21h
+     49							 end start			 ; конец программы
+Turbo Assembler	 Version 3.1	    09/09/23 20:08:46	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/09/23"
+??FILENAME			  Text	 "laba1	  "
+??TIME				  Text	 "20:08:46"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0F0FH
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA1
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@STARTUP			  Near	 _TEXT:0000
+@WORDSIZE			  Text	 2
+A				  Word	 DGROUP:0000
+B				  Word	 DGROUP:0002
+C				  Word	 DGROUP:0004
+QUIT				  Near	 _TEXT:0036
+START				  Near	 _TEXT:0000
+X				  Word	 DGROUP:0006
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  0008 Word	  Public  DATA
+_TEXT				  16  003B Word	  Public  CODE
+

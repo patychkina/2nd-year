@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Point">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Shape">
+    <Position X="5.25" Y="2.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgACAAAQQQAABgAAAAAAAAAAAAAAQIAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="arc" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Parallelogram">
+    <Position X="7" Y="6.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgCAAAQQQAAAAAAAAAAAAAAAAAAQJAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Rectangle">
+    <Position X="2.75" Y="6.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAACAAAQQQAAAAAAgAAAAAAAAAAAQIAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FactoryShape">
+    <Position X="1" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Operation">
+    <Position X="10" Y="3" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAQBAAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Laba3.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

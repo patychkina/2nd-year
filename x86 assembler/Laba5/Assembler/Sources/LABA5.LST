@@ -1,0 +1,338 @@
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 1
+laba5.asm
+
+
+
+      1	0000			     model  SMALL
+      2	0000			     stack  100h
+      3	0000			     dataseg
+      4
+      5	0000  0A 0D 45 6E 74 65	72+	     Ask1  db 0Ah,0Dh,'Enter first:$'; приглашение на ввод первого  +
+      6	      20 66 69 72 73 74	3A+  числа
+      7	      24
+      8	000F  0A 0D 45 6E 74 65	72+	     Ask2  db 0Ah,0Dh,'Enter second:$';	приглашение на ввод второго +
+      9	      20 73 65 63 6F 6E	64+  числа	;
+     10	      3A 24
+     11	001F  0B			     Buf1  db 11
+     12	0020  ??			     Len1  db ?						     ; длина 1 строки
+     13	0021  0C*(??)			     Opnd1  db 12 dup( ? )		     ; буфер 1 числа
+     14	002D  0B			     Buf2  db 11
+     15	002E  ??			     Len2  db ?						     ; длина 2 строки
+     16	002F  0C*(??)			     Opnd2  db 12 dup( ? )		     ; буфер 2 числа
+     17	003B  0A 0D 52 65 73 75	6C+	     ResT  db 0Ah,0Dh,'Result: '	     ; приглашение на вывод	    +
+     18	      74 3A 20		     результата
+     19	0045  0C*(20) 24		     Res  db 12	dup(' '),'$'		     ; буфер результата
+     20	0052  0A 0D			     AskCont db	0Ah,0Dh
+     21	0054  45 78 69 74 20 2D	20+	     db	'Exit -	Esc, Next - all	'
+     22	      45 73 63 2C 20 4E	65+
+     23	      78 74 20 2D 20 61	6C+
+     24	      6C 20
+     25	006B  24			     db	'$'
+     26
+     27	006C			     codeseg
+     28				     startupcode
+1    29	0000			     @Startup:
+1    30	0000  BA 0000s			     MOV     DX,@data
+1    31	0003  8E DA			     MOV     DS,DX
+1    32	0005  8C D3			     MOV     BX,SS
+1    33	0007  2B DA			     SUB     BX,DX
+1    34	0009  D1 E3 D1 E3 D1 E3	D1+	     SHL     BX,4
+     35	      E3
+1    36	0011  FA			     CLI
+1    37	0012  8E D2			     MOV     SS,DX
+1    38	0014  03 E3			     ADD     SP,BX
+1    39	0016  FB			     STI
+     40	0017  1E			     push  DS
+     41	0018  07			     pop  ES						     ; ES <- DS
+     42
+     43	0019			     BEGIN:
+     44
+     45				     ;Ввод первого слагаемого
+     46	0019			     B1:
+     47	0019  BA 0000r			     lea  DX, Ask1			     ; в DX занести адрес строки
+     48	001C  B4 09			     mov  AH, 09h			     ; в АН занести номер	    +
+     49				     функции (вывод)
+     50	001E  CD 21			     int  21h					     ; вызов прерывания
+     51
+     52	0020  BA 001Fr			     lea  DX, Buf1			     ; в DX занести адрес строки
+     53	0023  B4 0A			     mov  AH, 0Ah			     ; в АН занести номер	    +
+     54				     функции (ввод)
+     55	0025  CD 21			     int  21h					     ; вызов прерывания
+     56
+     57	0027  80 3E 0020r 00		     cmp  Len1,	0			     ; сравниваем длину строки +
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 2
+laba5.asm
+
+
+
+     58				     с	нулем
+     59	002C  74 EB			     je	 B1					     ; если	равен нулю, то   +
+     60				     вводим заново
+     61
+     62				     ;проверка 0-9 и очистка старш.тетрады
+     63	002E  BB 0021r			     lea  BX, Opnd1
+     64	0031  33 C9			     xor  CX, CX			     ; обнулить	регистр CX
+     65	0033  8A 0E 0020r		     mov  CL, Len1			     ; в СL занести длину	строки
+     66	0037  33 F6			     xor  SI, SI			     ; обнулить	регистр SI
+     67
+     68	0039			     T1:
+     69	0039  8A 00			     mov  AL, [BX][SI]
+     70	003B  3C 30			     cmp  AL, '0'			     ; сравнить	с кодом нуля
+     71	003D  72 DA			     jb	 B1					     ; ошибка  ; если	ниже,   +
+     72				     ошибка
+     73	003F  3C 39			     cmp  AL, '9'			     ; сравнить	с кодом девятки
+     74	0041  77 D6			     ja	 B1					     ; ошибка  ; если	выше,   +
+     75				     ошибка
+     76	0043  24 0F			     and  AL, 0Fh			     ; обнулить	старшую		    +
+     77				     тетраду (АL & 0000	1111)
+     78	0045  88 00			     mov  [BX][SI], AL			     ; занести результат в	    +
+     79				     массив
+     80	0047  46			     inc  SI					     ; перейти к		    +
+     81				     следующему элементу
+     82	0048  E2 EF			     loop  T1					     ; проверка	на конец	    +
+     83				     цикла	и переход на метку
+     84
+     85				     ;прижать к	правому краю
+     86	004A  8A 0E 0020r		     mov  CL, Len1			     ; в CL занести длину строки
+     87	004E  80 F9 0A			     cmp  CL, 10			     ; сравнить	СL с 10
+     88	0051  74 1C			     je	 E1					     ; если	равно, то	    +
+     89				     перейти на метку
+     90	0053  BF 0009			     mov  DI, 9					     ; в DI занести смещение+
+     91				     (адрес конца строки)
+     92	0056  8B F1			     mov  SI, CX			     ; в SI занести смещение	    +
+     93				     (адрес первого	разряда + 1)
+     94	0058  4E			     dec  SI					     ; уменьшить SI на	    +
+     95				     единицу
+     96	0059			     P1:
+     97	0059  8A 00			     mov  AL, [BX][SI]			     ; в АL занести элемент	    +
+     98				     массива
+     99	005B  88 01			     mov  [BX][DI], AL			     ; поместить AL в	правую	    +
+    100				     часть	массива
+    101	005D  4F			     dec  DI					     ; уменьшить DI на	    +
+    102				     единицу
+    103	005E  4E			     dec  SI					     ; уменьшить SI на	    +
+    104				     единицу
+    105	005F  E2 F8			     loop  P1					     ; проверить на конец   +
+    106				     цикла	и перейти по метке
+    107
+    108				     ;обнулить лишнее
+    109	0061  33 FF			     xor  DI, DI			     ; обнулить	регистр DI
+    110	0063  B1 0A			     mov  CL, 10			     ; занести в регистр	СL	    +
+    111				     значение 10
+    112	0065  2A 0E 0020r		     sub  CL, Len1			     ; отнять от CL длину строки
+    113	0069			     N1:
+    114	0069  C6 01 00			     mov  byte ptr [BX][DI], 0	     ; заменить	на нуль
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 3
+laba5.asm
+
+
+
+    115	006C  47			     inc  DI					     ; увеличить DI на	    +
+    116				     единицу
+    117	006D  E2 FA			     loop  N1					     ; проверить на конец   +
+    118				     цикла	и перейти по метке
+    119	006F			     E1:
+    120
+    121				     ;Ввод второго слагаемого
+    122	006F			     B2:
+    123	006F  BA 000Fr			      lea  DX, Ask2			     ; в DX занести адрес строки
+    124	0072  B4 09			      mov  AH, 09h			     ; в АН занести номер	    +
+    125				     функции (вывод)
+    126	0074  CD 21			      int  21h					     ; вызов прерывания
+    127	0076  BA 002Dr			      lea  DX, Buf2			     ; в DX занести адрес строки
+    128	0079  B4 0A			      mov  AH, 0Ah			     ; в АН занести номер	    +
+    129				     функции (ввод)
+    130	007B  CD 21			      int  21h					     ; вызов прерывания
+    131	007D  80 3E 002Er 00		      cmp  Len2, 0			     ; сравниваем длину строки +
+    132				     с	нулем
+    133	0082  74 EB			      je  B2					     ; если	равен нулю, то   +
+    134				     вводим заново
+    135
+    136				     ;проверка 0-9 и очистка старш.тетрады
+    137	0084  BB 002Fr			       lea  BX,	Opnd2
+    138	0087  33 C9			       xor  CX,	CX			     ; обнулить	регистр CX
+    139	0089  8A 0E 002Er		       mov  CL,	Len2			     ; в СL занести длину	строки
+    140	008D  33 F6			       xor  SI,	SI			     ; обнулить	регистр SI
+    141
+    142	008F			     T2:
+    143	008F  8A 00			      mov  AL, [BX][SI]
+    144	0091  3C 30			       cmp  AL,	'0'			     ; сравнить	с кодом нуля
+    145	0093  72 DA			       jb  B2					     ; ошибка если < 0
+    146	0095  3C 39			       cmp  AL,	'9'			     ; сравнить	с кодом девятки
+    147	0097  77 D6			       ja  B2					     ; ошибка если > 0
+    148	0099  24 0F			       and  AL,	0Fh			     ; обнулить	старшую		    +
+    149				     тетраду (& 0000 1111)
+    150	009B  88 00			       mov  [BX][SI], AL		     ; занести результат в	    +
+    151				     массив
+    152	009D  46			       inc  SI					     ; перейти к		    +
+    153				     следующему элементу
+    154	009E  E2 EF			       loop  T2					     ; проверка	на конец	    +
+    155				     цикла	и переход на метку
+    156
+    157				     ;прижать к	правому краю
+    158	00A0  8A 0E 002Er		       mov  CL,	Len2			     ; в CL занести длину строки
+    159	00A4  80 F9 0A			       cmp  CL,	10			     ; сравнить	СL с 10
+    160	00A7  74 1C			       je  E2					     ; если	равно, то	    +
+    161				     перейти на метку
+    162	00A9  BF 0009			       mov  DI,	9			     ; в DI занести смещение	    +
+    163				     (адрес конца строки)
+    164	00AC  8B F1			       mov  SI,	CX			     ; в SI занести смещение	    +
+    165				     (адрес первого	разряда + 1)
+    166	00AE  4E			       dec  SI					     ; уменьшить SI на	    +
+    167				     единицу
+    168
+    169	00AF			     P2:
+    170	00AF  8A 00			      mov  AL, [BX][SI]			     ; в АL занести элемент	    +
+    171				     массива
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 4
+laba5.asm
+
+
+
+    172	00B1  88 01			       mov  [BX][DI], AL		     ; поместить AL в	правую	    +
+    173				     часть	массива
+    174	00B3  4F			       dec  DI					     ; уменьшить DI на	    +
+    175				     единицу
+    176	00B4  4E			       dec  SI					     ; уменьшить SI на	    +
+    177				     единицу
+    178	00B5  E2 F8			       loop  P2					     ; проверить на конец   +
+    179				     цикла	и перейти по метке
+    180
+    181				     ;обнулить лишнее
+    182	00B7  33 FF			       xor  DI,	DI			     ; обнулить	регистр DI
+    183	00B9  B1 0A			       mov  CL,	10			     ; занести в регистр	СL	    +
+    184				     значение 10
+    185	00BB  2A 0E 002Er		       sub  CL,	Len2			     ; отнять от CL длину строки
+    186	00BF			     N2:
+    187	00BF  C6 01 00			      mov  byte	ptr [BX][DI], 0	     ; заменить	на нуль
+    188	00C2  47			      inc  DI					     ; увеличить DI на	    +
+    189				     единицу
+    190	00C3  E2 FA			      loop  N2					     ; проверить на конец   +
+    191				     цикла	и перейти по метке
+    192	00C5			     E2:
+    193
+    194				     ;Вычитание
+    195	00C5  33 C9			     xor CX, CX					     ; Очищаем регистр CX
+    196	00C7  B9 000A			     mov  CX, 10
+    197	00CA  BE 002Ar			     lea SI, Opnd1+9			     ; Адрес первого операнда
+    198	00CD  BF 0038r			     lea DI, Opnd2+9			     ; Адрес второго операнда
+    199	00D0  BB 004Fr			     lea BX, Res+10			     ; Адрес результата
+    200
+    201	00D3			     A1:
+    202	00D3  8A 04			     mov     AL, [SI]
+    203	00D5  1A 05			     sbb     AL, [DI]
+    204	00D7  3F			     aas
+    205	00D8  88 07			     mov     [BX], AL
+    206	00DA  4E			     dec     SI
+    207	00DB  4F			     dec     DI
+    208	00DC  4B			     dec     BX
+    209	00DD  E2 F4			     loop    A1
+    210	00DF  72 03			     jc	_NEG
+    211	00E1  EB 1C 90			     jmp _POS
+    212	00E4			     _NEG:
+    213	00E4  B9 000A			     mov CX, 10
+    214	00E7  F8			     clc
+    215	00E8  BB 004Fr			     lea BX, Res+10
+    216	00EB			     NEG_loop:
+    217	00EB  B0 10			     mov AL, 10h;
+    218	00ED  1A 07			     sbb AL, [BX]
+    219	00EF  3F			     aas
+    220	00F0  88 07			     mov [BX], AL
+    221	00F2  4B			     dec BX
+    222	00F3  E2 F6			     loop NEG_loop
+    223	00F5  C6 07 2D			     mov byte ptr [BX],	2Dh
+    224	00F8  43			     inc BX
+    225	00F9  B9 000A			     mov CX, 10
+    226	00FC  EB 04 90			     jmp A2
+    227	00FF			     _POS:
+    228				     ;Преобразование результата	в ASCII
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 5
+laba5.asm
+
+
+
+    229	00FF  B9 000B			     mov CX, 11
+    230	0102			     A2:
+    231	0102  80 0F 30			     or	byte ptr [BX], 30h
+    232	0105  43			     inc  BX
+    233	0106  E2 FA			     loop  A2
+    234					     ;Вывод результата
+    235	0108  BA 003Br			     lea     DX, ResT
+    236	010B  B4 09			     mov     AH, 09h
+    237	010D  CD 21			     int     21h
+    238					     ;Запрос на	продолжение работы
+    239	010F  BA 0052r			     lea     DX, AskCont
+    240	0112  B4 09			     mov     AH, 09h
+    241	0114  CD 21			     int     21h
+    242	0116  B4 08			     mov     AH, 08h
+    243	0118  CD 21			     int     21h
+    244	011A  3C 1B			     cmp     AL, 27
+    245					     ;ESC
+    246	011C  74 03			     je	     QUIT
+    247	011E  E9 FEF8			     jmp     BEGIN ;Конец работы
+    248	0121			     QUIT:
+    249				     exitcode  0
+1   250	0121  B8 4C00			     MOV     AX,04C00h
+1   251	0124  CD 21			     INT     21h
+    252				     end
+Turbo Assembler	 Version 3.1	    11/14/23 12:56:08	    Page 6
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "11/14/23"
+??FILENAME			  Text	 "laba5	  "
+??TIME				  Text	 "12:56:08"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA5
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@STARTUP			  Near	 _TEXT:0000
+@WORDSIZE			  Text	 2
+A1				  Near	 _TEXT:00D3
+A2				  Near	 _TEXT:0102
+ASK1				  Byte	 DGROUP:0000
+ASK2				  Byte	 DGROUP:000F
+ASKCONT				  Byte	 DGROUP:0052
+B1				  Near	 _TEXT:0019
+B2				  Near	 _TEXT:006F
+BEGIN				  Near	 _TEXT:0019
+BUF1				  Byte	 DGROUP:001F
+BUF2				  Byte	 DGROUP:002D
+E1				  Near	 _TEXT:006F
+E2				  Near	 _TEXT:00C5
+LEN1				  Byte	 DGROUP:0020
+LEN2				  Byte	 DGROUP:002E
+N1				  Near	 _TEXT:0069
+N2				  Near	 _TEXT:00BF
+NEG_LOOP			  Near	 _TEXT:00EB
+OPND1				  Byte	 DGROUP:0021
+OPND2				  Byte	 DGROUP:002F
+P1				  Near	 _TEXT:0059
+P2				  Near	 _TEXT:00AF
+QUIT				  Near	 _TEXT:0121
+RES				  Byte	 DGROUP:0045
+REST				  Byte	 DGROUP:003B
+T1				  Near	 _TEXT:0039
+T2				  Near	 _TEXT:008F
+_NEG				  Near	 _TEXT:00E4
+_POS				  Near	 _TEXT:00FF
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  006C Word	  Public  DATA
+_TEXT				  16  0126 Word	  Public  CODE
+

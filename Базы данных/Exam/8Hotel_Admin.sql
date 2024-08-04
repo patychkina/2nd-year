@@ -1,0 +1,15 @@
+GO
+CREATE LOGIN [hoteluser] WITH PASSWORD=N'Hoste1U5er-2022', DEFAULT_DATABASE=[Hotel], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
+GO
+CREATE SCHEMA [archive]
+GO
+CREATE USER [hoteluser] FOR LOGIN [hoteluser] WITH DEFAULT_SCHEMA=[archive]
+GO
+USE [Hotel]
+GO
+ALTER ROLE [db_datareader] ADD MEMBER [hoteluser]
+GO
+use [Hotel]
+GO
+DENY DELETE ON SCHEMA::[archive] TO [hoteluser]
+GO

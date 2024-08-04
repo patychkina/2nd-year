@@ -1,0 +1,1 @@
+select * into [Reservation_Archive] from [dbo].[Reservation] where 1=0

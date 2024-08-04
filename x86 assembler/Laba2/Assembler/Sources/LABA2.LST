@@ -1,0 +1,103 @@
+Turbo Assembler	 Version 3.1	    09/25/23 14:51:53	    Page 1
+laba2.asm
+
+
+
+      1	0000				     model SMALL			     ; Определение типа модели +
+      2				     памяти
+      3
+      4	0000				     stack 100h				     ; Определение сегмента	    +
+      5				     стека	размером 256 байт
+      6	0000				     dataseg				     ; Определение сегмента	    +
+      7				     данных
+      8
+      9	0000  ????		     count	     dw	?		     ; Переменная размером 2 байта
+     10	0002  01 02 03 04 FB FA	     mass	     db	1, 2, 3, 4, -5,	-6   ; Байтовый	массив
+     11	0008  0006		     size_mass	     dw	6		     ; Размер массива (2 байта)
+     12	000A  01		     one	 db 1			     ; Байтовая	переменная со	    +
+     13				     значением	1
+     14
+     15	000B				     codeseg				     ; Определение сегмент кода
+     16	0000			     START:
+     17					     startupcode			     ; Начало выполнения	    +
+     18				     программы
+1    19	0000			     @Startup:
+1    20	0000  BA 0000s			     MOV     DX,@data
+1    21	0003  8E DA			     MOV     DS,DX
+1    22	0005  8C D3			     MOV     BX,SS
+1    23	0007  2B DA			     SUB     BX,DX
+1    24	0009  D1 E3 D1 E3 D1 E3	D1+	     SHL     BX,4
+     25	      E3
+1    26	0011  FA			     CLI
+1    27	0012  8E D2			     MOV     SS,DX
+1    28	0014  03 E3			     ADD     SP,BX
+1    29	0016  FB			     STI
+     30
+     31	0017  BB 0002r			     lea BX, mass		     ; Загрузить адрес массива
+     32	001A  8B 0E 0008r		     mov CX, size_mass		     ; Установить счётчик
+     33	001E  BA 0000			     mov DX, 0
+     34
+     35	0021			     BEG:
+     36	0021  8A 07			     mov AL, [BX]		     ; Элемент массива по адресу BX в+
+     37				     регистр - аккумулятор, 1	байт
+     38	0023  84 06 000Ar		     test AL, one		     ; Проверяем на чётность		    +
+     39				     поразрядной конъюнкцией
+     40	0027  75 03			     jnz UNEVEN				     ; Переходим по метке UNEVEN,   +
+     41				     если число нечетное
+     42	0029  83 C2 01			     add DX, 1				     ; Увеличиваем число	    +
+     43				     чётных чисел на 1
+     44	002C			     UNEVEN:
+     45	002C  83 C3 01			     add BX, 1				     ; Следующий элемент	    +
+     46				     массива
+     47	002F  E2 F0			     loop BEG				     ; Возврат, если	счётчик CX <>+
+     48				     0
+     49	0031  89 16 0000r		     mov count,	DX		     ; Записть в count значения	в	    +
+     50				     регистре DX
+     51
+     52	0035			     QUIT:
+     53					     exitcode 0				     ; Возврат управления	    +
+     54				     операционной системе, код возврата 0
+1    55	0035  B8 4C00			     MOV     AX,04C00h
+1    56	0038  CD 21			     INT     21h
+     57					     end					     ; Конец программы
+Turbo Assembler	 Version 3.1	    09/25/23 14:51:53	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/25/23"
+??FILENAME			  Text	 "laba2	  "
+??TIME				  Text	 "14:51:53"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA2
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@STARTUP			  Near	 _TEXT:0000
+@WORDSIZE			  Text	 2
+BEG				  Near	 _TEXT:0021
+COUNT				  Word	 DGROUP:0000
+MASS				  Byte	 DGROUP:0002
+ONE				  Byte	 DGROUP:000A
+QUIT				  Near	 _TEXT:0035
+SIZE_MASS			  Word	 DGROUP:0008
+START				  Near	 _TEXT:0000
+UNEVEN				  Near	 _TEXT:002C
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  000B Word	  Public  DATA
+_TEXT				  16  003A Word	  Public  CODE
+

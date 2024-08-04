@@ -1,0 +1,149 @@
+Turbo Assembler	 Version 3.1	    10/23/23 14:37:18	    Page 1
+laba4.asm
+
+
+
+      1	0000				     model SMALL									    +
+      2				     ; Определение типа модели памяти
+      3
+      4	0000				     stack 100h										    +
+      5				     ; Определение сегмента стека размером 256 байт
+      6	0000				     dataseg										    +
+      7				     ; Определение сегмента данных
+      8	0000  0A 0D 45 6E 74 65	72+  input_message db 0Ah,0Dh,'Enter the line:',0Ah,0Dh,'$'					    +
+      9	      20 74 68 65 20 6C	69+  ;
+     10	      6E 65 3A 0A 0D 24
+     11	0014  0A 0D 52 65 73 75	6C+  output_message db 0Ah,0Dh,'Result:',0Ah,0Dh,'$'						    +
+     12	      74 3A 0A 0D 24	     ;
+     13	0020  64*(24)		     BUFFER db 100 dup('$')									    +
+     14				     ;												    +
+     15				     ;
+     16	0084  64*(24)		     MUSOR db 100 dup('$')									    +
+     17				     ; Дополнительная строковая переменная
+     18	00E8				     codeseg										    +
+     19				     ; Определение сегмент кода
+     20	0000			     START:
+     21	0000  B8 0000s			     mov AX, @DATA									    +
+     22				     ; В регистра AX смещение для данных
+     23	0003  8E D8			     mov DS, AX										    +
+     24				     ; Установить регистр DS равный AX то ест теперь там	    +
+     25				     смещение
+     26	0005  BA 0000r			     lea DX,input_message								 ;  +
+     27				     Адрес	строки – в DX
+     28	0008  B4 09			     mov AH,09h										    +
+     29				     ; Номер функции – в	AH (вывод)
+     30	000A  CD 21			     int 21h										    +
+     31				     ; Вызов функции
+     32	000C  BA 0020r			     lea DX,BUFFER									    +
+     33				     ; Адрес буфера – в DX
+     34	000F  B4 0A			     mov AH,0Ah										    +
+     35				     ; Номер функции – в	AH (ввод)
+     36	0011  CD 21			     int 21h										    +
+     37				     ; Вызов функции
+     38	0013  33 C0			     xor AX, AX										    +
+     39				     ; Очистить	значение региста	AX
+     40	0015  BB 0022r			     lea BX, BUFFER+2									    +
+     41				     ; В BX адрес	начала введеной строки
+     42	0018  33 C9			     xor CX, CX										    +
+     43				     ; Очистить	значение региста	СX
+     44	001A  8A 0E 0021r		     mov CL,BUFFER+1									    +
+     45				     ; В CX записать длину строки
+     46	001E  BE 0000			     mov SI, 0										    +
+     47				     ; SI = 0
+     48	0021  8B F9			     mov DI, CX										    +
+     49				     ; DI = длина строки
+     50	0023  4F			     dec DI										    +
+     51				     ; DI = DI - 1 (индекс последнего символа строки)
+     52	0024			     SWAP:
+     53	0024  3B F7			 cmp SI, DI										    +
+     54				     ; Сравниваем SI и DI
+     55	0026  79 0A			 jns PRINT_RESULT									    +
+     56				     ;
+     57
+Turbo Assembler	 Version 3.1	    10/23/23 14:37:18	    Page 2
+laba4.asm
+
+
+
+     58	0028  8A 00			 mov AL, [BX+SI]									    +
+     59				     ;
+     60	002A  86 01			 xchg AL, [BX+DI]									    +
+     61				     ;
+     62	002C  88 00			 mov [BX+SI], AL									    +
+     63				     ;
+     64
+     65	002E  46			 inc SI											    +
+     66				     ;
+     67	002F  4F			 dec DI											    +
+     68				     ;
+     69	0030  EB F2			 jmp SWAP										    +
+     70				     ;
+     71
+     72	0032			     PRINT_RESULT:
+     73	0032  B4 09			 mov AH, 09h										    +
+     74				     ;
+     75	0034  BA 0014r			 lea DX, output_message									    +
+     76				     ;
+     77	0037  CD 21			 int 21h										    +
+     78				     ;
+     79
+     80	0039  B4 09			 mov AH, 09h										    +
+     81				     ;
+     82	003B  BA 0022r			 lea DX, BUFFER+2									    +
+     83				     ;
+     84	003E  CD 21			 int 21h										    +
+     85				     ;
+     86
+     87	0040  BA 0084r			     lea DX,MUSOR									    +
+     88				     ;
+     89	0043  B4 0A			     mov AH,0Ah										    +
+     90				     ;Номер функции	– в AH
+     91	0045  CD 21			     int 21h
+     92	0047			     QUIT:
+     93					     exitcode 0										    +
+     94				     ; Возврат управления операционной системе, код	    +
+     95				     возврата 0
+1    96	0047  B8 4C00			     MOV     AX,04C00h
+1    97	004A  CD 21			     INT     21h
+     98					     end										    +
+     99				     ; Конец программы
+Turbo Assembler	 Version 3.1	    10/23/23 14:37:18	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "10/23/23"
+??FILENAME			  Text	 "laba4	  "
+??TIME				  Text	 "14:37:18"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 LABA4
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+BUFFER				  Byte	 DGROUP:0020
+INPUT_MESSAGE			  Byte	 DGROUP:0000
+MUSOR				  Byte	 DGROUP:0084
+OUTPUT_MESSAGE			  Byte	 DGROUP:0014
+PRINT_RESULT			  Near	 _TEXT:0032
+QUIT				  Near	 _TEXT:0047
+START				  Near	 _TEXT:0000
+SWAP				  Near	 _TEXT:0024
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  00E8 Word	  Public  DATA
+_TEXT				  16  004C Word	  Public  CODE
+
